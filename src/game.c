@@ -11,10 +11,20 @@ void gameInit() {
     rot = 0;
     testSprite.textureId = 1;
     worldCreateTilemap(512, 512);
+    srand(56);
     worldRandomize();
     gfxInit();
     gfxSetRaycastingWindow(0, 0, GFX_SCREEN_WIDTH, GFX_SCREEN_HEIGHT);
     inputInit();
+}
+
+void movePlayer(double dx, double dy) {
+    if(!worldGetCollisionInArea(x - 0.1 + dx, y - 0.1, 0.2, 0.2)) {
+        x += dx;
+    }
+    if(!worldGetCollisionInArea(x - 0.1, y - 0.1 + dy, 0.2, 0.2)) {
+        y += dy;
+    }
 }
 
 void getInput() {
@@ -45,8 +55,7 @@ void getInput() {
         rot+=turnspeed;
     }
     vec2Rotate(&vx, &vy, rot);
-    x += vx;
-    y += vy;
+    movePlayer(vx, vy);
 }
 
 void gameStep() {
@@ -56,6 +65,7 @@ void gameStep() {
     gfxBegin();
     gfxSetCamera(x, y, rot, 85);
     gfxRenderWorld();
+    gfxRenderSprite(&testSprite, 31, 31);
     gfxEnd();
 }
 

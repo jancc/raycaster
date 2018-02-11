@@ -30,6 +30,23 @@ uint8_t worldGetTile(uint32_t x, uint32_t y) {
     return tilemap[y * tilemapHeight + x];
 }
 
+uint8_t worldGetCollision(uint32_t x, uint32_t y) {
+    return worldGetTile(x, y) != 0;
+}
+
+uint8_t worldGetCollisionInArea(double areaX, double areaY, double areaW, double areaH) {
+    uint32_t xStart = (uint32_t)areaX;
+    uint32_t yStart = (uint32_t)areaY;
+    uint32_t xEnd = (uint32_t)(areaX + areaW);
+    uint32_t yEnd = (uint32_t)(areaY + areaH);
+    for(uint32_t y = yStart; y <= yEnd; y++) {
+        for(uint32_t x = xStart; x <= xEnd; x++) {
+            if(worldGetCollision(x, y)) return 1;
+        }
+    }
+    return 0;
+}
+
 void worldClear() {
     free(tilemap);
     tilemapWidth = 0;
