@@ -1,0 +1,6 @@
+data/music/
+raycaster
+*.exe
+*.dll
+*.o
+*.swp
