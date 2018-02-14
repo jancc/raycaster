@@ -1,7 +1,7 @@
 #ifndef INPUT_H
 #define INPUT_H
 
-#define INPUT_MAXKEYS 10
+#define INPUT_MAXKEYS 11
 #define INPUT_UNDEF 0
 #define INPUT_FORWARD 1
 #define INPUT_BACKWARD 2
@@ -12,6 +12,7 @@
 #define INPUT_FIRE 7
 #define INPUT_USE 8
 #define INPUT_RUN 9
+#define INPUT_TOGGLEMENU 10
 
 void inputInit();
 void inputUpdate();
@@ -19,5 +20,6 @@ void inputUpdate();
 int inputGetQuit();
 int inputGetFullscreen();
 uint8_t inputGetKey(unsigned int key);
+uint8_t inputGetKeyDown(unsigned int key);
 
 #endif

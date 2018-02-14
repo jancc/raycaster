@@ -6,6 +6,7 @@ static SDL_Event event;
 static int quit;
 static int fullscreen;
 static uint8_t keys[INPUT_MAXKEYS];
+static uint8_t keysDown[INPUT_MAXKEYS];
 static uint8_t sdlScancodeLookup[SDL_MAX_SCANCODES];
 
 void resetEvents() {
@@ -13,10 +14,12 @@ void resetEvents() {
     quit = 0;
 }
 
+void resetKeysDown() {
+    memset(&keysDown, 0, sizeof(keysDown) * sizeof(uint8_t));
+}
+
 void resetKeys() {
-    for(uint8_t i = 0; i < INPUT_MAXKEYS; i++) {
-        keys[i] = 0;
-    }
+    memset(&keys, 0, sizeof(keys) * sizeof(uint8_t));
 }
 
 void inputInit() {
@@ -35,25 +38,27 @@ void inputInit() {
     sdlScancodeLookup[SDL_SCANCODE_D] = INPUT_STRAFERIGHT;
     sdlScancodeLookup[SDL_SCANCODE_LCTRL] = INPUT_FIRE;
     sdlScancodeLookup[SDL_SCANCODE_RCTRL] = INPUT_FIRE;
+    sdlScancodeLookup[SDL_SCANCODE_RETURN] = INPUT_FIRE;
     sdlScancodeLookup[SDL_SCANCODE_SPACE] = INPUT_USE;
     sdlScancodeLookup[SDL_SCANCODE_LSHIFT] = INPUT_RUN;
+    sdlScancodeLookup[SDL_SCANCODE_ESCAPE] = INPUT_TOGGLEMENU;
 }
 
 void handleSpecialKeys() {
     if((SDL_GetModState() & KMOD_ALT) > 0 && event.key.keysym.sym == SDLK_RETURN) {
         fullscreen = 1;
-    } else if(event.key.keysym.sym == SDLK_ESCAPE) {
-        quit = 1;
     }
 }
 
 void handleKey(uint8_t state) {
     uint8_t key = sdlScancodeLookup[event.key.keysym.scancode];
     keys[key] = state;
+    keysDown[key] = state;
 }
 
 void inputUpdate() {
     resetEvents();
+    resetKeysDown();
     while(SDL_PollEvent(&event)) {
         switch(event.type) {
             case SDL_QUIT:
@@ -83,4 +88,8 @@ int inputGetFullscreen() {
 
 uint8_t inputGetKey(unsigned int key) {
     return keys[key];
+}
+
+uint8_t inputGetKeyDown(unsigned int key) {
+    return keysDown[key];
 }

@@ -8,6 +8,14 @@ void vec2Rotate(double * x, double * y, double angle) {
     *y = sin(angle)*(original_x) + cos(angle)*(original_y);
 }
 
+double vec2Magnitude(double x, double y) {
+    return sqrt(x*x + y*y);
+}
+
+double vec2SqrMagnitude(double x, double y) {
+    return x*x + y*y;
+}
+
 double vec2SqrDist(double x1, double y1, double x2, double y2) {
     double x = x2 - x1;
     double y = y2 - y1;
@@ -18,6 +26,12 @@ double vec2Dist(double x1, double y1, double x2, double y2) {
     double x = x2 - x1;
     double y = y2 - y1;
     return sqrt(x*x + y*y);
+}
+
+void vec2Normalize(double * x, double * y) {
+    double mag = vec2Magnitude(*x, *y);
+    *x = *x / mag;
+    *y = *y / mag;
 }
 
 double radToDeg(double rad) {

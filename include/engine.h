@@ -12,5 +12,6 @@
 #include "gfx.h"
 #include "input.h"
 #include "bmath.h"
+#include "menu.h"
 
 #endif
