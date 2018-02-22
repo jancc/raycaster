@@ -7,13 +7,13 @@
 #define GFX_SCREEN_HEIGHT 360
 #define GFX_TEXTURE_STORAGE_SIZE 256
 
-typedef struct texture {
+typedef struct texture_s {
     uint8_t * data;
     uint32_t width;
     uint32_t height;
 } Texture;
 
-typedef struct sprite {
+typedef struct sprite_s {
     uint32_t textureId;
 } Sprite;
 
