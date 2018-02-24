@@ -11,10 +11,11 @@ typedef struct ent_s {
     Sprite * sprite;
 } Ent;
 
-typedef struct hitcastOut_s {
+typedef struct hitscanOut_s {
     uint8_t hit;
+    double sqrDistance;
     Ent * ent;
-} HitcastOut;
+} HitscanOut;
 
 typedef struct ray_s {
     double x;
@@ -39,8 +40,7 @@ uint8_t worldGetCollisionInArea(double x, double y, double w, double h);
 Ent * worldSpawnEnt(double x, double y);
 Ent ** worldGetEnts();
 size_t worldGetEntsSize();
-HitcastOut worldHitcast(double x, double y, double dx, double dy);
-uint8_t worldHitscanTest(Ray * ray, AABB * box);
+HitscanOut worldHitscan(Ray * ray);
 void worldInit();
 void worldUpdate();
 void worldClear();

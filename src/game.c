@@ -83,14 +83,10 @@ void drawEnts() {
     double dy = 0;
     vec2Rotate(&dx, &dy, rot);
     Ray ray = {x, y, dx, dy};
-    AABB box;
+    HitscanOut hit = worldHitscan(&ray);
     for(size_t i = 0; i < worldGetEntsSize(); i++) {
-        if(ents[i] != NULL) {
-            box.x1 = ents[i]->x - 0.5;
-            box.x2 = ents[i]->x + 0.5;
-            box.y1 = ents[i]->y - 0.5;
-            box.y2 = ents[i]->y + 0.5;
-            if(!worldHitscanTest(&ray, &box)) gfxRenderSprite(&testSprite, ents[i]->x, ents[i]->y);
+        if(ents[i] != NULL && ents[i] != hit.ent) {
+            gfxRenderSprite(&testSprite, ents[i]->x, ents[i]->y);
         }
     }
 }

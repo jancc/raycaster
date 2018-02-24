@@ -97,7 +97,7 @@ size_t worldGetEntsSize() {
  * Adapted from:
  * https://tavianator.com/fast-branchless-raybounding-box-intersections/
 */
-uint8_t worldHitscanTest(Ray * ray, AABB * box) {
+uint8_t testRayBoxIntersection(Ray * ray, AABB * box) {
     double invDX = 1 / ray->dx;
     double invDY = 1 / ray->dy;
     double tx1 = (box->x1 - ray->x)*invDX;
@@ -112,7 +112,33 @@ uint8_t worldHitscanTest(Ray * ray, AABB * box) {
     tmin = fmax(tmin, fmin(ty1, ty2));
     tmax = fmin(tmax, fmax(ty1, ty2));
 
-    return tmax >= tmin;
+    return tmax >= tmin && tmax >= 0;
+}
+
+HitscanOut worldHitscan(Ray * ray) {
+    HitscanOut out;
+    memset(&out, 0, sizeof(HitscanOut));
+    out.ent = NULL;
+    out.sqrDistance = INFINITY;
+    AABB aabb;
+    for(size_t i = 0; i < entsArraySize; i++) {
+        if(ents[i] != NULL) {
+            aabb.x1 = ents[i]->x - 0.5;
+            aabb.x2 = ents[i]->x + 0.5;
+            aabb.y1 = ents[i]->y - 0.5;
+            aabb.y2 = ents[i]->y + 0.5;
+            if(testRayBoxIntersection(ray, &aabb)) {
+                // only replace ent if the distance to it would be larger
+                double sqrDistance = vec2SqrDist(ray->x, ray->y, ents[i]->x, ents[i]->y);
+                if(sqrDistance < out.sqrDistance) {
+                    out.sqrDistance = sqrDistance;
+                    out.ent = ents[i];
+                }
+                out.hit = 1;
+            }
+        }
+    }
+    return out;
 }
 
 void worldClear() {
