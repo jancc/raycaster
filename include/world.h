@@ -13,7 +13,8 @@ typedef struct ent_s {
 
 typedef struct hitscanOut_s {
     uint8_t hit;
-    double sqrDistance;
+    double x;
+    double y;
     Ent * ent;
 } HitscanOut;
 
@@ -38,9 +39,10 @@ uint8_t worldGetTile(uint32_t x, uint32_t y);
 uint8_t worldGetCollision(uint32_t x, uint32_t y);
 uint8_t worldGetCollisionInArea(double x, double y, double w, double h);
 Ent * worldSpawnEnt(double x, double y);
+void worldDespawnEnt(Ent * ent, uint8_t autoFree);
 Ent ** worldGetEnts();
 size_t worldGetEntsSize();
-HitscanOut worldHitscan(Ray * ray);
+uint8_t worldHitscan(Ray * ray, HitscanOut * out);
 void worldInit();
 void worldUpdate();
 void worldClear();

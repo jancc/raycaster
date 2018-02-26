@@ -77,15 +77,22 @@ void doMenuIngame() {
     if(menuDoButton("quit")) forceQuit = 1;
 }
 
-void drawEnts() {
-    Ent ** ents = worldGetEnts();
+void testShooting() {
+    if(!inputGetKeyDown(INPUT_FIRE)) return;
     double dx = 1;
     double dy = 0;
     vec2Rotate(&dx, &dy, rot);
     Ray ray = {x, y, dx, dy};
-    HitscanOut hit = worldHitscan(&ray);
+    HitscanOut hit;
+    if(worldHitscan(&ray, &hit)) {
+        worldDespawnEnt(hit.ent, 1);
+    }
+}
+
+void drawEnts() {
+    Ent ** ents = worldGetEnts();
     for(size_t i = 0; i < worldGetEntsSize(); i++) {
-        if(ents[i] != NULL && ents[i] != hit.ent) {
+        if(ents[i] != NULL) {
             gfxRenderSprite(&testSprite, ents[i]->x, ents[i]->y);
         }
     }
@@ -98,6 +105,7 @@ void gameStep() {
     if(!showMenu) {
         getInput();
     }
+    testShooting();
     gfxBegin();
     gfxSetCamera(x, y, rot, 90);
     gfxRenderWorld();

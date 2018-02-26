@@ -85,6 +85,15 @@ Ent * worldSpawnEnt(double x, double y) {
     return NULL;
 }
 
+void worldDespawnEnt(Ent * ent, uint8_t autoFree) {
+    for(size_t i = 0; i < entsArraySize; i++) {
+        if(ents[i] == ent) {
+            ents[i] = NULL;
+        }
+    }
+    if(autoFree) free(ent);
+}
+
 Ent ** worldGetEnts() {
     return ents;
 }
@@ -115,30 +124,94 @@ uint8_t testRayBoxIntersection(Ray * ray, AABB * box) {
     return tmax >= tmin && tmax >= 0;
 }
 
-HitscanOut worldHitscan(Ray * ray) {
-    HitscanOut out;
-    memset(&out, 0, sizeof(HitscanOut));
-    out.ent = NULL;
-    out.sqrDistance = INFINITY;
+uint8_t testRayEntCollision(Ray * ray, Ent ** ent) {
+    *ent = NULL;
+    uint8_t hit = 0;
+    double sqrDistanceTest = INFINITY;
     AABB aabb;
     for(size_t i = 0; i < entsArraySize; i++) {
         if(ents[i] != NULL) {
-            aabb.x1 = ents[i]->x - 0.5;
-            aabb.x2 = ents[i]->x + 0.5;
-            aabb.y1 = ents[i]->y - 0.5;
-            aabb.y2 = ents[i]->y + 0.5;
+            aabb.x1 = ents[i]->x - 0.25;
+            aabb.x2 = ents[i]->x + 0.25;
+            aabb.y1 = ents[i]->y - 0.25;
+            aabb.y2 = ents[i]->y + 0.25;
             if(testRayBoxIntersection(ray, &aabb)) {
                 // only replace ent if the distance to it would be larger
                 double sqrDistance = vec2SqrDist(ray->x, ray->y, ents[i]->x, ents[i]->y);
-                if(sqrDistance < out.sqrDistance) {
-                    out.sqrDistance = sqrDistance;
-                    out.ent = ents[i];
+                if(sqrDistance < sqrDistanceTest) {
+                    sqrDistanceTest = sqrDistance;
                 }
-                out.hit = 1;
+                *ent = ents[i];
+                hit = 1;
             }
         }
     }
-    return out;
+    return hit;
+}
+
+uint8_t testRayTileCollision(Ray * ray, double * x, double * y) {
+    int mapX = ray->x;
+    int mapY = ray->y;
+    double deltaDistX = sqrt(1 + (ray->dy*ray->dy) / (ray->dx*ray->dx));
+    double deltaDistY = sqrt(1 + (ray->dx*ray->dx) / (ray->dy*ray->dy));
+    double sideDistX;
+    double sideDistY;
+    int stepX;
+    int stepY;
+    if(ray->dx < 0) {
+        stepX = -1;
+        sideDistX = (ray->x - mapX) * deltaDistX;
+    } else {
+        stepX = 1;
+        sideDistX = (mapX + 1.0 - ray->x) * deltaDistX;
+    }
+    if(ray->dy < 0) {
+        stepY = -1;
+        sideDistY = (ray->y - mapY) * deltaDistY;
+    } else {
+        stepY = 1;
+        sideDistY = (mapY + 1.0 - ray->y) * deltaDistY;
+    }
+    int hit = 0;
+    while(hit == 0) {
+        if(sideDistX < sideDistY) {
+            sideDistX += deltaDistX;
+            mapX += stepX;
+        } else {
+            sideDistY += deltaDistY;
+            mapY += stepY;
+        }
+        if(worldGetTile(mapX, mapY) > 0) {
+            hit = 1;
+        }
+    }
+    *x = mapX;
+    *y = mapY;
+    return hit;
+}
+
+uint8_t worldHitscan(Ray * ray, HitscanOut * out) {
+    memset(out, 0, sizeof(HitscanOut));
+    double x = INFINITY;
+    double y = INFINITY;
+    out->hit = testRayTileCollision(ray, &x, &y);
+    Ent * ent;
+    out->hit = testRayEntCollision(ray, &ent);
+    if(ent != NULL) {
+        double sqrEntDist = (ent->x-ray->x)*(ent->x-ray->x)+(ent->y-ray->y)*(ent->y-ray->y);
+        double sqrTileDist = (x-ray->x)*(x-ray->x)+(y-ray->y)*(y-ray->y);
+        if(sqrEntDist < sqrTileDist) {
+            // ent closer
+            out->ent = ent;
+            out->x = ent->x;
+            out->y = ent->y;
+        }
+    } else {
+        // tile closer
+        out->x = x;
+        out->y = y;
+    }
+    return out->hit;
 }
 
 void worldClear() {
