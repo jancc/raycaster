@@ -28,6 +28,7 @@ void gfxRenderWorld();
 void gfxRenderSprite(Sprite * sprite, double x, double y);
 void gfxRenderChar(char c, uint32_t x, uint32_t y);
 void gfxRenderText(char * text, uint32_t x, uint32_t y);
+void gfxRenderHud(Player * player);
 
 int gfxLoadTexture(const char * filename, uint32_t id);
 

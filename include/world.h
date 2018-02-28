@@ -4,18 +4,14 @@
 #include <stdint.h>
 
 typedef struct sprite_s Sprite;
-
-typedef struct ent_s {
-    double x;
-    double y;
-    Sprite * sprite;
-} Ent;
+typedef struct player_s Player;
+typedef struct monster_s Monster;
 
 typedef struct hitscanOut_s {
     uint8_t hit;
     double x;
     double y;
-    Ent * ent;
+    Monster * monster;
 } HitscanOut;
 
 typedef struct ray_s {
@@ -38,10 +34,12 @@ void worldSetTile(uint32_t x, uint32_t y, uint8_t value);
 uint8_t worldGetTile(uint32_t x, uint32_t y);
 uint8_t worldGetCollision(uint32_t x, uint32_t y);
 uint8_t worldGetCollisionInArea(double x, double y, double w, double h);
-Ent * worldSpawnEnt(double x, double y);
-void worldDespawnEnt(Ent * ent, uint8_t autoFree);
-Ent ** worldGetEnts();
-size_t worldGetEntsSize();
+void worldResetPlayer(double x, double y);
+Player * worldGetPlayer();
+Monster * worldSpawnMonster(double x, double y);
+void worldDespawnMonster(Monster * monster, uint8_t autoFree);
+Monster ** worldGetMonsters();
+size_t worldGetMonstersSize();
 uint8_t worldHitscan(Ray * ray, HitscanOut * out);
 void worldInit();
 void worldUpdate();

@@ -14,5 +14,7 @@
 #include "input.h"
 #include "bmath.h"
 #include "menu.h"
+#include "player.h"
+#include "monster.h"
 
 #endif

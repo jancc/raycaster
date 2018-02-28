@@ -3,24 +3,27 @@
 static uint8_t * tilemap;
 static uint32_t tilemapWidth;
 static uint32_t tilemapHeight;
-static Ent ** ents;
-static size_t entsArraySize;
-static size_t entsCount;
+static Player * player;
+static Monster ** monsters;
+static size_t monstersArraySize;
+static size_t monstersCount;
 
-// double the size of our ents array
-void entsArrayExpand() {
-    ents = realloc(ents, entsArraySize * 2 * sizeof(Ent *));
-    for(size_t i = entsArraySize; i < entsArraySize * 2; i++) {
-        ents[i] = NULL;
+// double the size of our monsters array
+void monstersArrayExpand() {
+    monsters = realloc(monsters, monstersArraySize * 2 * sizeof(Monster *));
+    for(size_t i = monstersArraySize; i < monstersArraySize * 2; i++) {
+        monsters[i] = NULL;
     }
-    entsArraySize *= 2;
+    monstersArraySize *= 2;
 }
 
 void worldInit() {
-    entsArraySize = 1;
-    entsCount = 0;
-    ents = malloc(entsArraySize * sizeof(Ent *));
-    ents[0] = NULL;
+    player = malloc(sizeof(Player));
+    worldResetPlayer(1, 1);
+    monstersArraySize = 1;
+    monstersCount = 0;
+    monsters = malloc(monstersArraySize * sizeof(Monster *));
+    monsters[0] = NULL;
 }
 
 void worldCreateTilemap(uint32_t width, uint32_t height) {
@@ -66,40 +69,52 @@ uint8_t worldGetCollisionInArea(double areaX, double areaY, double areaW, double
     return 0;
 }
 
-Ent * worldSpawnEnt(double x, double y) {
-    Ent * newEnt = calloc(1, sizeof(Ent));
-    newEnt->x = x;
-    newEnt->y = y;
-    if(entsCount + 1 > entsArraySize) {
-        entsArrayExpand();
+void worldResetPlayer(double x, double y) {
+    memset(player, 0, sizeof(Player));
+    player->x = x;
+    player->y = y;
+    player->health = 100;
+}
+
+Player * worldGetPlayer() {
+    return player;
+}
+
+Monster * worldSpawnMonster(double x, double y) {
+    Monster * newMonster = calloc(1, sizeof(Monster));
+    newMonster->x = x;
+    newMonster->y = y;
+    newMonster->type = MT_theUltimateMan;
+    if(monstersCount + 1 > monstersArraySize) {
+        monstersArrayExpand();
     }
-    for(size_t i = 0; i < entsArraySize; i++) {
-        if(ents[i] == NULL) {
-            ents[i] = newEnt;
-            entsCount++;
-            return newEnt;
+    for(size_t i = 0; i < monstersArraySize; i++) {
+        if(monsters[i] == NULL) {
+            monsters[i] = newMonster;
+            monstersCount++;
+            return newMonster;
         }
     }
     // should not happen normally
-    free(newEnt);
+    free(newMonster);
     return NULL;
 }
 
-void worldDespawnEnt(Ent * ent, uint8_t autoFree) {
-    for(size_t i = 0; i < entsArraySize; i++) {
-        if(ents[i] == ent) {
-            ents[i] = NULL;
+void worldDespawnMonster(Monster * monster, uint8_t autoFree) {
+    for(size_t i = 0; i < monstersArraySize; i++) {
+        if(monsters[i] == monster) {
+            monsters[i] = NULL;
         }
     }
-    if(autoFree) free(ent);
+    if(autoFree) free(monster);
 }
 
-Ent ** worldGetEnts() {
-    return ents;
+Monster ** worldGetMonsters() {
+    return monsters;
 }
 
-size_t worldGetEntsSize() {
-    return entsArraySize;
+size_t worldGetMonstersSize() {
+    return monstersArraySize;
 }
 
 /*
@@ -124,24 +139,24 @@ uint8_t testRayBoxIntersection(Ray * ray, AABB * box) {
     return tmax >= tmin && tmax >= 0;
 }
 
-uint8_t testRayEntCollision(Ray * ray, Ent ** ent) {
-    *ent = NULL;
+uint8_t testRayMonsterCollision(Ray * ray, Monster ** monster) {
+    *monster = NULL;
     uint8_t hit = 0;
     double sqrDistanceTest = INFINITY;
     AABB aabb;
-    for(size_t i = 0; i < entsArraySize; i++) {
-        if(ents[i] != NULL) {
-            aabb.x1 = ents[i]->x - 0.25;
-            aabb.x2 = ents[i]->x + 0.25;
-            aabb.y1 = ents[i]->y - 0.25;
-            aabb.y2 = ents[i]->y + 0.25;
+    for(size_t i = 0; i < monstersArraySize; i++) {
+        if(monsters[i] != NULL) {
+            aabb.x1 = monsters[i]->x - 0.25;
+            aabb.x2 = monsters[i]->x + 0.25;
+            aabb.y1 = monsters[i]->y - 0.25;
+            aabb.y2 = monsters[i]->y + 0.25;
             if(testRayBoxIntersection(ray, &aabb)) {
-                // only replace ent if the distance to it would be larger
-                double sqrDistance = vec2SqrDist(ray->x, ray->y, ents[i]->x, ents[i]->y);
+                // only replace monster if the distance to it would be larger
+                double sqrDistance = vec2SqrDist(ray->x, ray->y, monsters[i]->x, monsters[i]->y);
                 if(sqrDistance < sqrDistanceTest) {
                     sqrDistanceTest = sqrDistance;
                 }
-                *ent = ents[i];
+                *monster = monsters[i];
                 hit = 1;
             }
         }
@@ -195,16 +210,16 @@ uint8_t worldHitscan(Ray * ray, HitscanOut * out) {
     double x = INFINITY;
     double y = INFINITY;
     out->hit = testRayTileCollision(ray, &x, &y);
-    Ent * ent;
-    out->hit = testRayEntCollision(ray, &ent);
-    if(ent != NULL) {
-        double sqrEntDist = (ent->x-ray->x)*(ent->x-ray->x)+(ent->y-ray->y)*(ent->y-ray->y);
+    Monster * monster;
+    out->hit = testRayMonsterCollision(ray, &monster);
+    if(monster != NULL) {
+        double sqrMonsterDist = (monster->x-ray->x)*(monster->x-ray->x)+(monster->y-ray->y)*(monster->y-ray->y);
         double sqrTileDist = (x-ray->x)*(x-ray->x)+(y-ray->y)*(y-ray->y);
-        if(sqrEntDist < sqrTileDist) {
-            // ent closer
-            out->ent = ent;
-            out->x = ent->x;
-            out->y = ent->y;
+        if(sqrMonsterDist < sqrTileDist) {
+            // monster closer
+            out->monster = monster;
+            out->x = monster->x;
+            out->y = monster->y;
         }
     } else {
         // tile closer

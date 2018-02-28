@@ -1,16 +1,10 @@
 #include "engine.h"
 
 Sprite testSprite;
-double x;
-double y;
-double rot;
 uint8_t showMenu;
 uint8_t forceQuit;
 
 void gameInit() {
-    x = 32;
-    y = 32;
-    rot = 0;
     showMenu = 0;
     forceQuit = 0;
     testSprite.textureId = 1;
@@ -22,52 +16,12 @@ void gameInit() {
     inputInit();
     menuInit();
     worldInit();
-    worldSpawnEnt(31.5, 31.5);
-    worldSpawnEnt(32.5, 31.5);
-    worldSpawnEnt(33.5, 31.5);
-    worldSpawnEnt(34.5, 31.5);
-    worldSpawnEnt(35.5, 31.5);
-}
-
-void movePlayer(double dx, double dy) {
-    if(!worldGetCollisionInArea(x - 0.1 + dx, y - 0.1, 0.2, 0.2)) {
-        x += dx;
-    }
-    if(!worldGetCollisionInArea(x - 0.1, y - 0.1 + dy, 0.2, 0.2)) {
-        y += dy;
-    }
-}
-
-void getInput() {
-    double vx = 0;
-    double vy = 0;
-    double speed = 0.05;
-    double turnspeed = 0.03;
-    if(inputGetKey(INPUT_RUN)) {
-        speed = 0.1;
-        turnspeed = 0.05;
-    }
-    if(inputGetKey(INPUT_FORWARD)) {
-        vx=1;
-    }
-    if(inputGetKey(INPUT_BACKWARD)) {
-        vx=-1;
-    }
-    if(inputGetKey(INPUT_STRAFELEFT)) {
-        vy=-1;
-    }
-    if(inputGetKey(INPUT_STRAFERIGHT)) {
-        vy=1;
-    }
-    if(inputGetKey(INPUT_TURNLEFT)) {
-        rot-=turnspeed;
-    }
-    if(inputGetKey(INPUT_TURNRIGHT)) {
-        rot+=turnspeed;
-    }
-    vec2Rotate(&vx, &vy, rot);
-    vec2Normalize(&vx, &vy);
-    movePlayer(vx * speed, vy * speed);
+    worldResetPlayer(32, 32);
+    worldSpawnMonster(31.5, 31.5);
+    worldSpawnMonster(32.5, 31.5);
+    worldSpawnMonster(33.5, 31.5);
+    worldSpawnMonster(34.5, 31.5);
+    worldSpawnMonster(35.5, 31.5);
 }
 
 void doMenuIngame() {
@@ -77,23 +31,11 @@ void doMenuIngame() {
     if(menuDoButton("quit")) forceQuit = 1;
 }
 
-void testShooting() {
-    if(!inputGetKeyDown(INPUT_FIRE)) return;
-    double dx = 1;
-    double dy = 0;
-    vec2Rotate(&dx, &dy, rot);
-    Ray ray = {x, y, dx, dy};
-    HitscanOut hit;
-    if(worldHitscan(&ray, &hit)) {
-        worldDespawnEnt(hit.ent, 1);
-    }
-}
-
-void drawEnts() {
-    Ent ** ents = worldGetEnts();
-    for(size_t i = 0; i < worldGetEntsSize(); i++) {
-        if(ents[i] != NULL) {
-            gfxRenderSprite(&testSprite, ents[i]->x, ents[i]->y);
+void drawMonsters() {
+    Monster ** monsters = worldGetMonsters();
+    for(size_t i = 0; i < worldGetMonstersSize(); i++) {
+        if(monsters[i] != NULL) {
+            gfxRenderSprite(&testSprite, monsters[i]->x, monsters[i]->y);
         }
     }
 }
@@ -102,14 +44,16 @@ void gameStep() {
     inputUpdate();
     if(inputGetFullscreen()) gfxToggleFullscreen();
     if(inputGetKeyDown(INPUT_TOGGLEMENU)) showMenu = !showMenu;
+    Player * player = worldGetPlayer();
     if(!showMenu) {
-        getInput();
+        playerUpdate(player);
+        monstersUpdate();
     }
-    testShooting();
     gfxBegin();
-    gfxSetCamera(x, y, rot, 90);
+    gfxSetCamera(player->x, player->y, player->rot, 90);
     gfxRenderWorld();
-    drawEnts();
+    drawMonsters();
+    gfxRenderHud(player);
     if(showMenu) {
         menuBegin();
         doMenuIngame();
