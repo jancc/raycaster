@@ -282,6 +282,6 @@ int gfxLoadTexture(const char * filename, uint32_t id) {
 
 void gfxRenderHud(Player * player) {
     char buf[255];
-    sprintf(&buf, "Health: %d\nWeapon: %s\nAmmo: %d\nScore: %d", player->health, "AK-47", 10000, 404);
+    snprintf(&buf, 255, "Health: %d\nWeapon: %s\nAmmo: %d\nScore: %d", player->health, "AK-47", 10000, 404);
     gfxRenderText(&buf, 16, GFX_SCREEN_HEIGHT - 48);
 }
