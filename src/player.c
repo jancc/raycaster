@@ -36,7 +36,7 @@ void playerDoShooting(Player * player) {
     vec2Rotate(&dx, &dy, player->rot);
     Ray ray = {player->x, player->y, dx, dy};
     HitscanOut hit;
-    if(worldHitscan(&ray, &hit)) {
+    if(worldHitscan(&ray, &hit, 1, 1)) {
         worldDespawnMonster(hit.monster, 1);
     }
 }

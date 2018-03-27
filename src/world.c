@@ -80,23 +80,21 @@ Player * worldGetPlayer() {
     return player;
 }
 
-Monster * worldSpawnMonster(double x, double y) {
-    Monster * newMonster = calloc(1, sizeof(Monster));
-    newMonster->x = x;
-    newMonster->y = y;
-    newMonster->type = MT_theUltimateMan;
+Monster * worldSpawnMonster(Monster * monster, double x, double y) {
+    monster->x = x;
+    monster->y = y;
     if(monstersCount + 1 > monstersArraySize) {
         monstersArrayExpand();
     }
     for(size_t i = 0; i < monstersArraySize; i++) {
         if(monsters[i] == NULL) {
-            monsters[i] = newMonster;
+            monsters[i] = monster;
             monstersCount++;
-            return newMonster;
+            return monster;
         }
     }
     // should not happen normally
-    free(newMonster);
+    free(monster);
     return NULL;
 }
 
@@ -139,7 +137,7 @@ uint8_t testRayBoxIntersection(Ray * ray, AABB * box) {
     return tmax >= tmin && tmax >= 0;
 }
 
-uint8_t testRayMonsterCollision(Ray * ray, Monster ** monster) {
+uint8_t worldHitscanMonsters(Ray * ray, Monster ** monster) {
     *monster = NULL;
     uint8_t hit = 0;
     double sqrDistanceTest = INFINITY;
@@ -164,7 +162,7 @@ uint8_t testRayMonsterCollision(Ray * ray, Monster ** monster) {
     return hit;
 }
 
-uint8_t testRayTileCollision(Ray * ray, double * x, double * y) {
+uint8_t worldHitscanTiles(Ray * ray, double * x, double * y) {
     int mapX = ray->x;
     int mapY = ray->y;
     double deltaDistX = sqrt(1 + (ray->dy*ray->dy) / (ray->dx*ray->dx));
@@ -205,13 +203,17 @@ uint8_t testRayTileCollision(Ray * ray, double * x, double * y) {
     return hit;
 }
 
-uint8_t worldHitscan(Ray * ray, HitscanOut * out) {
+uint8_t worldHitscan(Ray * ray, HitscanOut * out, uint8_t tiles, uint8_t monsters) {
     memset(out, 0, sizeof(HitscanOut));
     double x = INFINITY;
     double y = INFINITY;
-    out->hit = testRayTileCollision(ray, &x, &y);
-    Monster * monster;
-    out->hit = testRayMonsterCollision(ray, &monster);
+    if(tiles) {
+        out->hit = worldHitscanTiles(ray, &x, &y);
+    }
+    Monster * monster = NULL;
+    if(monsters) {
+        out->hit = worldHitscanMonsters(ray, &monster);
+    }
     if(monster != NULL) {
         double sqrMonsterDist = (monster->x-ray->x)*(monster->x-ray->x)+(monster->y-ray->y)*(monster->y-ray->y);
         double sqrTileDist = (x-ray->x)*(x-ray->x)+(y-ray->y)*(y-ray->y);

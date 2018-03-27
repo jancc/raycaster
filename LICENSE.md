@@ -17,3 +17,8 @@ the following restrictions:
     misrepresented as being the original software.
 
 3.  This notice may not be removed or altered from any source distribution.
+
+
+
+Please also see CREDITS.md, because certain resources may be licensed under
+different conditions.

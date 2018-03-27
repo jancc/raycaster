@@ -1,10 +1,11 @@
 #include "engine.h"
 
-Sprite testSprite;
-uint8_t showMenu;
-uint8_t forceQuit;
+static Sprite testSprite;
+static uint8_t showMenu;
+static uint8_t forceQuit;
 
 void gameInit() {
+    timingInit();
     showMenu = 0;
     forceQuit = 0;
     testSprite.textureId = 1;
@@ -16,12 +17,9 @@ void gameInit() {
     inputInit();
     menuInit();
     worldInit();
+    monstersInit();
     worldResetPlayer(32, 32);
-    worldSpawnMonster(31.5, 31.5);
-    worldSpawnMonster(32.5, 31.5);
-    worldSpawnMonster(33.5, 31.5);
-    worldSpawnMonster(34.5, 31.5);
-    worldSpawnMonster(35.5, 31.5);
+    worldSpawnMonster(monsterCreate(MT_slime), 31.5, 31.5);
 }
 
 void doMenuIngame() {
@@ -31,16 +29,8 @@ void doMenuIngame() {
     if(menuDoButton("quit")) forceQuit = 1;
 }
 
-void drawMonsters() {
-    Monster ** monsters = worldGetMonsters();
-    for(size_t i = 0; i < worldGetMonstersSize(); i++) {
-        if(monsters[i] != NULL) {
-            gfxRenderSprite(&testSprite, monsters[i]->x, monsters[i]->y);
-        }
-    }
-}
-
 void gameStep() {
+    timingUpdate();
     inputUpdate();
     if(inputGetFullscreen()) gfxToggleFullscreen();
     if(inputGetKeyDown(INPUT_TOGGLEMENU)) showMenu = !showMenu;
@@ -52,7 +42,7 @@ void gameStep() {
     gfxBegin();
     gfxSetCamera(player->x, player->y, player->rot, 90);
     gfxRenderWorld();
-    drawMonsters();
+    monstersDraw();
     gfxRenderHud(player);
     if(showMenu) {
         menuBegin();

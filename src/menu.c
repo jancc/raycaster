@@ -29,14 +29,14 @@ uint8_t menuDoButton(char * text) {
     uint8_t state = 0;
     char buf[255];
     if(current == selected) {
-        snprintf(&buf, 255, "> %s", text);
+        snprintf(buf, 255, "> %s", text);
         if(inputGetKeyDown(INPUT_FIRE)) {
             state = 1;
         }
     } else {
-        snprintf(&buf, 255, "%s", text);
+        snprintf(buf, 255, "%s", text);
     }
-    gfxRenderText(&buf, 32, 32 + current * 16);
+    gfxRenderText(buf, 32, 32 + current * 16);
     current++;
     return state;
 }

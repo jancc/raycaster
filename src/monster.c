@@ -1,12 +1,102 @@
 #include "engine.h"
 
+static Sprite spriteUltimateMan;
+static Sprite spriteSlime;
+
+void monstersInit() {
+    spriteUltimateMan.textureId = GFX_TEXTURE_ULTIMATEMAN;
+    spriteUltimateMan.cellCountX = 1;
+    spriteUltimateMan.cellCountY = 1;
+    spriteUltimateMan.cellWidth = 64;
+    spriteUltimateMan.cellHeight = 64;
+
+    spriteSlime.textureId = GFX_TEXTURE_SLIME;
+    spriteSlime.cellCountX = 4;
+    spriteSlime.cellCountY = 4;
+    spriteSlime.cellWidth = 64;
+    spriteSlime.cellHeight = 64;
+}
+
+// TODO: turn into an actual state machine thingy
+void updateMonster(Monster * monster) {
+    Player * player = worldGetPlayer();
+    double sqrPlayerDist = vec2SqrDist(monster->x, monster->y, player->x, player->y);
+    double dx = player->x - monster->x;
+    double dy = player->y - monster->y;
+    vec2Normalize(&dx, &dy);
+    if(monster->sawPlayer) {
+        if(sqrPlayerDist > monster->meleeSqrDistance) {
+            monster->state = MS_move;
+            monster->x += dx * monster->speed;
+            monster->y += dy * monster->speed;
+        } else if (monster->meleeNextAttack < getTime()) {
+            monster->state = MS_attackMelee;
+            player->health -= monster->meleeDamage;
+            monster->meleeNextAttack = getTime() + monster->meleeFrequency;
+        }
+    } else {
+        monster->state = MS_idle;
+        Ray ray = {monster->x, monster->y, dx, dy};
+        HitscanOut out;
+        worldHitscan(&ray, &out, 1, 0);
+        monster->sawPlayer = out.hit && vec2SqrDist(monster->x, monster->y, out.x, out.y) > sqrPlayerDist;
+    }
+
+    // TODO: better, more versitile animation code
+    switch(monster->state) {
+    case MS_idle:
+        monster->spriteFrameX = 0;
+        monster->spriteFrameY = 0;
+        break;
+    case MS_move:
+        monster->spriteFrameX = (int)(getTime() * 4) % 4;
+        monster->spriteFrameY = 0;
+        break;
+    case MS_attackMelee:
+        monster->spriteFrameX = (int)(getTime() * 6) % 4;
+        monster->spriteFrameY = 1;
+        break;
+    }
+}
+
 void monstersUpdate() {
     Monster ** monsters = worldGetMonsters();
     size_t monstersSize = worldGetMonstersSize();
     for(size_t i = 0; i < monstersSize; i++) {
         Monster * monster = monsters[i];
         if(monster == NULL) continue;
-        monster->x += (rand() % 4 - 2) * 0.01;
-        monster->y += (rand() % 4 - 2) * 0.01;
+        updateMonster(monster);
     }
+}
+
+void monstersDraw() {
+    Monster ** monsters = worldGetMonsters();
+    for(size_t i = 0; i < worldGetMonstersSize(); i++) {
+        Monster * monster = monsters[i];
+        if(monster != NULL) {
+            gfxRenderSprite(monster->sprite, monster->x, monster->y, monster->spriteFrameX, monster->spriteFrameY);
+        }
+    }
+}
+
+Monster * monsterCreate(MonsterType type) {
+    Monster * monster = malloc(sizeof(Monster));
+    memset(monster, 0, sizeof(Monster));
+    switch(type) {
+    case MT_theUltimateMan:
+        monster->sprite = &spriteUltimateMan;
+        monster->speed = 0.01;
+        monster->meleeSqrDistance = 1;
+        monster->meleeDamage = 1;
+        monster->meleeFrequency = 1;
+        break;
+    case MT_slime:
+        monster->sprite = &spriteSlime;
+        monster->speed = 0.01;
+        monster->meleeSqrDistance = 1;
+        monster->meleeDamage = 1;
+        monster->meleeFrequency = 1;
+        break;
+    }
+    return monster;
 }

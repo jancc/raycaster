@@ -2,6 +2,7 @@
 #define ENGINE_H
 
 #include <stdlib.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
@@ -16,5 +17,7 @@
 #include "menu.h"
 #include "player.h"
 #include "monster.h"
+#include "projectile.h"
+#include "timing.h"
 
 #endif

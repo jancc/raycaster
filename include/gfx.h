@@ -7,6 +7,11 @@
 #define GFX_SCREEN_HEIGHT 360
 #define GFX_TEXTURE_STORAGE_SIZE 256
 
+#define GFX_WALLS_STARTINDEX 100
+#define GFX_FONT_POTASH 2
+#define GFX_TEXTURE_ULTIMATEMAN 1
+#define GFX_TEXTURE_SLIME 3
+
 typedef struct texture_s {
     uint8_t * data;
     uint32_t width;
@@ -15,6 +20,10 @@ typedef struct texture_s {
 
 typedef struct sprite_s {
     uint32_t textureId;
+    uint32_t cellWidth;
+    uint32_t cellHeight;
+    uint32_t cellCountX;
+    uint32_t cellCountY;
 } Sprite;
 
 void gfxInit();
@@ -25,7 +34,7 @@ void gfxSetCamera(double x, double y, double angle, double fov);
 void gfxSetRaycastingWindow(uint32_t x, uint32_t y, uint32_t w, uint32_t h);
 void gfxSetFontTexture(uint32_t id, uint32_t charWidth, uint32_t charHeight, uint32_t charCountX);
 void gfxRenderWorld();
-void gfxRenderSprite(Sprite * sprite, double x, double y);
+void gfxRenderSprite(Sprite * sprite, double x, double y, int frameX, int frameY);
 void gfxRenderChar(char c, uint32_t x, uint32_t y);
 void gfxRenderText(char * text, uint32_t x, uint32_t y);
 void gfxRenderHud(Player * player);

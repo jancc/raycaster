@@ -21,17 +21,18 @@ void gfxInit() {
     screen = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET, GFX_SCREEN_WIDTH, GFX_SCREEN_HEIGHT);
     raycasterScreen = NULL;
     zbuffer = NULL;
-    gfxLoadTexture("data/sheep.png", 0);
-    gfxLoadTexture("data/theultimateman.png", 1);
-    gfxLoadTexture("data/potash_8x8.png", 2);
+    gfxLoadTexture("data/gfx/sheep.png", 0);
+    gfxLoadTexture("data/gfx/theultimateman.png", GFX_TEXTURE_ULTIMATEMAN);
+    gfxLoadTexture("data/gfx/ui/potash_8x8.png", GFX_FONT_POTASH);
+    gfxLoadTexture("data/gfx/enemies/slime.png", GFX_TEXTURE_SLIME);
 
-    gfxLoadTexture("data/gfx/brickwall01.png", 100);
-    gfxLoadTexture("data/gfx/brickwall02.png", 101);
-    gfxLoadTexture("data/gfx/brickwall03.png", 102);
-    gfxLoadTexture("data/gfx/brickwall04.png", 103);
-    gfxLoadTexture("data/gfx/brickwall05.png", 104);
-    gfxLoadTexture("data/gfx/dirtwall01.png", 105);
-    gfxLoadTexture("data/gfx/woodwall01.png", 106);
+    gfxLoadTexture("data/gfx/walls/brickwall01.png", 100);
+    gfxLoadTexture("data/gfx/walls/brickwall02.png", 101);
+    gfxLoadTexture("data/gfx/walls/brickwall03.png", 102);
+    gfxLoadTexture("data/gfx/walls/brickwall04.png", 103);
+    gfxLoadTexture("data/gfx/walls/brickwall05.png", 104);
+    gfxLoadTexture("data/gfx/walls/dirtwall01.png", 105);
+    gfxLoadTexture("data/gfx/walls/woodwall01.png", 106);
 
     gfxSetFontTexture(2, 8, 8, 16);
     gfxSetCamera(0, 0, 0, 90);
@@ -210,7 +211,7 @@ void gfxRenderWorld() {
     SDL_RenderCopy(renderer, raycasterScreen, NULL, &dst);
 }
 
-void gfxRenderSprite(Sprite * sprite, double x, double y) {
+void gfxRenderSprite(Sprite * sprite, double x, double y, int frameX, int frameY) {
     double relativeX = cameraX - x;
     double relativeY = cameraY - y;
     double mul = 1.0/(cameraBaseplaneX*cameraDirY-cameraBaseplaneY*cameraDirX);
@@ -222,8 +223,7 @@ void gfxRenderSprite(Sprite * sprite, double x, double y) {
     if(cameraspaceY < -0.5) {
         double scale = fabs(windowH/cameraspaceY);
         SDL_Rect src;
-        src.x = 0;
-        src.y = 0;
+        src.y = 64 * frameY;
         src.w = 1;
         src.h = 64;
         SDL_Rect dst;
@@ -232,7 +232,7 @@ void gfxRenderSprite(Sprite * sprite, double x, double y) {
         dst.w = 1;
         dst.h = scale;
         for(int x = 0; x < (int)scale; x++) {
-            src.x = x * (64.0/scale);
+            src.x = x * (64.0/scale) + 64 * frameX;
             if(zbuffer[dst.x] > fabs(cameraspaceY)) {
                 SDL_RenderCopy(renderer, textures[ sprite->textureId ], &src, &dst);
             }
@@ -282,6 +282,6 @@ int gfxLoadTexture(const char * filename, uint32_t id) {
 
 void gfxRenderHud(Player * player) {
     char buf[255];
-    snprintf(&buf, 255, "Health: %d\nWeapon: %s\nAmmo: %d\nScore: %d", player->health, "AK-47", 10000, 404);
-    gfxRenderText(&buf, 16, GFX_SCREEN_HEIGHT - 48);
+    snprintf(buf, 255, "Health: %d\nWeapon: %s\nAmmo: %d\nScore: %d", player->health, "AK-47", 10000, 404);
+    gfxRenderText(buf, 16, GFX_SCREEN_HEIGHT - 48);
 }
