@@ -21,18 +21,18 @@ void gfxInit() {
     screen = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET, GFX_SCREEN_WIDTH, GFX_SCREEN_HEIGHT);
     raycasterScreen = NULL;
     zbuffer = NULL;
-    gfxLoadTexture("data/gfx/sheep.png", 0);
-    gfxLoadTexture("data/gfx/theultimateman.png", GFX_TEXTURE_ULTIMATEMAN);
-    gfxLoadTexture("data/gfx/ui/potash_8x8.png", GFX_FONT_POTASH);
-    gfxLoadTexture("data/gfx/enemies/slime.png", GFX_TEXTURE_SLIME);
 
-    gfxLoadTexture("data/gfx/walls/brickwall01.png", 100);
-    gfxLoadTexture("data/gfx/walls/brickwall02.png", 101);
-    gfxLoadTexture("data/gfx/walls/brickwall03.png", 102);
-    gfxLoadTexture("data/gfx/walls/brickwall04.png", 103);
-    gfxLoadTexture("data/gfx/walls/brickwall05.png", 104);
-    gfxLoadTexture("data/gfx/walls/dirtwall01.png", 105);
-    gfxLoadTexture("data/gfx/walls/woodwall01.png", 106);
+    size_t texdefsCount = sizeof(texdefs) / sizeof(struct texdef_s);
+    for(size_t i = 0; i < texdefsCount; i++) {
+        struct texdef_s texdef = texdefs[i];
+        gfxLoadTexture(texdef.filename, texdef.id);
+    }
+
+    size_t tiletexdefsCount = sizeof(tiletexdefs) / sizeof(struct tiletexdef_s);
+    for(size_t i = 0; i < tiletexdefsCount; i++) {
+        struct tiletexdef_s tiletexdef = tiletexdefs[i];
+        gfxLoadTexture(tiletexdef.filename, tiletexdef.id + GFX_WALLS_STARTINDEX);
+    }
 
     gfxSetFontTexture(2, 8, 8, 16);
     gfxSetCamera(0, 0, 0, 90);
@@ -284,4 +284,15 @@ void gfxRenderHud(Player * player) {
     char buf[255];
     snprintf(buf, 255, "Health: %d\nWeapon: %s\nAmmo: %d\nScore: %d", player->health, "AK-47", 10000, 404);
     gfxRenderText(buf, 16, GFX_SCREEN_HEIGHT - 48);
+    SDL_Rect src;
+    src.x = 0;
+    src.y = 0;
+    src.w = 64;
+    src.h = 64;
+    SDL_Rect dst;
+    dst.x = windowX + windowW - 256;
+    dst.y = windowY + windowH - 256;
+    dst.w = 256;
+    dst.h = 256;
+    SDL_RenderCopy(renderer, textures[TEX_VIEW_KNIFE], &src, &dst);
 }

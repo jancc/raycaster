@@ -36,7 +36,8 @@ void playerDoShooting(Player * player) {
     vec2Rotate(&dx, &dy, player->rot);
     Ray ray = {player->x, player->y, dx, dy};
     HitscanOut hit;
-    if(worldHitscan(&ray, &hit, 1, 1)) {
+    worldHitscan(&ray, &hit, 1, 1);
+    if(hit.hit && hit.monster != NULL && vec2SqrDist(hit.x, hit.y, player->x, player->y) < 1) {
         worldDespawnMonster(hit.monster, 1);
     }
 }

@@ -2,8 +2,7 @@
 #define MONSTER_H
 
 #include <stdint.h>
-
-typedef struct sprite_s Sprite;
+#include "gfx.h"
 
 typedef enum monster_type_e {
     MT_theUltimateMan,
@@ -22,7 +21,7 @@ typedef enum monster_state_e {
 typedef struct monster_s {
     double x;
     double y;
-    Sprite * sprite;
+    Sprite sprite;
     int spriteFrameX;
     int spriteFrameY;
     MonsterType type;

@@ -1,20 +1,6 @@
 #include "engine.h"
 
-static Sprite spriteUltimateMan;
-static Sprite spriteSlime;
-
 void monstersInit() {
-    spriteUltimateMan.textureId = GFX_TEXTURE_ULTIMATEMAN;
-    spriteUltimateMan.cellCountX = 1;
-    spriteUltimateMan.cellCountY = 1;
-    spriteUltimateMan.cellWidth = 64;
-    spriteUltimateMan.cellHeight = 64;
-
-    spriteSlime.textureId = GFX_TEXTURE_SLIME;
-    spriteSlime.cellCountX = 4;
-    spriteSlime.cellCountY = 4;
-    spriteSlime.cellWidth = 64;
-    spriteSlime.cellHeight = 64;
 }
 
 // TODO: turn into an actual state machine thingy
@@ -74,7 +60,7 @@ void monstersDraw() {
     for(size_t i = 0; i < worldGetMonstersSize(); i++) {
         Monster * monster = monsters[i];
         if(monster != NULL) {
-            gfxRenderSprite(monster->sprite, monster->x, monster->y, monster->spriteFrameX, monster->spriteFrameY);
+            gfxRenderSprite(&monster->sprite, monster->x, monster->y, monster->spriteFrameX, monster->spriteFrameY);
         }
     }
 }
@@ -82,21 +68,29 @@ void monstersDraw() {
 Monster * monsterCreate(MonsterType type) {
     Monster * monster = malloc(sizeof(Monster));
     memset(monster, 0, sizeof(Monster));
-    switch(type) {
-    case MT_theUltimateMan:
-        monster->sprite = &spriteUltimateMan;
-        monster->speed = 0.01;
-        monster->meleeSqrDistance = 1;
-        monster->meleeDamage = 1;
-        monster->meleeFrequency = 1;
-        break;
-    case MT_slime:
-        monster->sprite = &spriteSlime;
-        monster->speed = 0.01;
-        monster->meleeSqrDistance = 1;
-        monster->meleeDamage = 1;
-        monster->meleeFrequency = 1;
-        break;
+    uint32_t spriteId = 0;
+    size_t monsterdefCount = sizeof(monsterdefs) / sizeof(struct monsterdef_s);
+    for(size_t i = 0; i < monsterdefCount; i++) {
+        struct monsterdef_s monsterdef = monsterdefs[i];
+        if(monsterdef.type == type) {
+            monster->speed = monsterdef.speed;
+            monster->meleeSqrDistance = monsterdef.meleeAttackDistance * monsterdef.meleeAttackDistance;
+            monster->meleeDamage = monsterdef.meleeDamage;
+            monster->meleeFrequency = monsterdef.meleeFrequency;
+            spriteId = monsterdef.spriteId;
+        }
+    }
+
+    size_t spritedefsCount = sizeof(spritedefs) / sizeof(struct spritedef_s);
+    for(size_t i = 0; i < spritedefsCount; i++) {
+        struct spritedef_s spritedef = spritedefs[i];
+        if(spritedef.id == spriteId) {
+            monster->sprite.textureId = spritedef.texture;
+            monster->sprite.cellWidth = spritedef.cellWidth;
+            monster->sprite.cellHeight = spritedef.cellHeight;
+            monster->sprite.cellCountX = spritedef.cellCountX;
+            monster->sprite.cellCountY = spritedef.cellCountY;
+        }
     }
     return monster;
 }

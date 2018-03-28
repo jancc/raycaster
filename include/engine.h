@@ -17,7 +17,8 @@
 #include "menu.h"
 #include "player.h"
 #include "monster.h"
-#include "projectile.h"
+//#include "projectile.h"
 #include "timing.h"
+#include "config.h"
 
 #endif

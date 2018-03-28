@@ -20,6 +20,9 @@ void gameInit() {
     monstersInit();
     worldResetPlayer(32, 32);
     worldSpawnMonster(monsterCreate(MT_slime), 31.5, 31.5);
+    worldSpawnMonster(monsterCreate(MT_slime), 33.5, 32.5);
+    worldSpawnMonster(monsterCreate(MT_slime), 31.5, 34.5);
+    worldSpawnMonster(monsterCreate(MT_slime), 33.5, 33.5);
 }
 
 void doMenuIngame() {

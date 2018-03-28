@@ -8,9 +8,6 @@
 #define GFX_TEXTURE_STORAGE_SIZE 256
 
 #define GFX_WALLS_STARTINDEX 100
-#define GFX_FONT_POTASH 2
-#define GFX_TEXTURE_ULTIMATEMAN 1
-#define GFX_TEXTURE_SLIME 3
 
 typedef struct texture_s {
     uint8_t * data;
