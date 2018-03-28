@@ -1,4 +1,5 @@
 #include "engine.h"
+#include "physfs.h"
 #include "SDL2/SDL_image.h"
 
 static SDL_Window * window;
@@ -270,7 +271,18 @@ void gfxRenderText(char * text, uint32_t x, uint32_t y) {
 }
 
 int gfxLoadTexture(const char * filename, uint32_t id) {
-    SDL_Surface * tempSurf = IMG_Load(filename);
+    PHYSFS_File * file = PHYSFS_openRead(filename);
+    if(file == NULL) {
+        printf("Failed to read image: %s\n", filename);
+    }
+    PHYSFS_sint64 filesize = PHYSFS_fileLength(file);
+    void * buffer = malloc(filesize * sizeof(char));
+    PHYSFS_readBytes(file, buffer, filesize);
+    SDL_RWops * fileRWops = SDL_RWFromMem(buffer, filesize);
+    SDL_Surface * tempSurf = IMG_Load_RW(fileRWops, 0);
+    SDL_RWclose(fileRWops);
+    free(buffer);
+    PHYSFS_close(file);
     if(tempSurf == NULL) {
         return 0;
     }

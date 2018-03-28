@@ -11,21 +11,21 @@ typedef enum textures_e {
     TEX_VIEW_KNIFE = 4
 } TextureId;
 static struct texdef_s {int id; const char * filename;} texdefs[] = {
-    {0, "data/gfx/sheep.png"},
-    {TEX_ULTIMATEMAN, "data/gfx/theultimateman"},
-    {TEX_FONT_POTASH, "data/gfx/ui/potash_8x8.png"},
-    {TEX_SLIME, "data/gfx/enemies/slime.png"},
-    {TEX_VIEW_KNIFE, "data/gfx/weapons/view_knive.png"}
+    {0, "gfx/sheep.png"},
+    {TEX_ULTIMATEMAN, "gfx/theultimateman.png"},
+    {TEX_FONT_POTASH, "gfx/ui/potash_8x8.png"},
+    {TEX_SLIME, "gfx/enemies/slime.png"},
+    {TEX_VIEW_KNIFE, "gfx/weapons/view_knive.png"}
 };
 
 static struct tiletexdef_s {int id; const char * filename;} tiletexdefs[] = {
-    {0, "data/gfx/walls/brickwall01.png"},
-    {1, "data/gfx/walls/brickwall02.png"},
-    {2, "data/gfx/walls/brickwall03.png"},
-    {3, "data/gfx/walls/brickwall04.png"},
-    {4, "data/gfx/walls/brickwall05.png"},
-    {5, "data/gfx/walls/dirtwall01.png"},
-    {6, "data/gfx/walls/woodwall01.png"}
+    {0, "gfx/walls/brickwall01.png"},
+    {1, "gfx/walls/brickwall02.png"},
+    {2, "gfx/walls/brickwall03.png"},
+    {3, "gfx/walls/brickwall04.png"},
+    {4, "gfx/walls/brickwall05.png"},
+    {5, "gfx/walls/dirtwall01.png"},
+    {6, "gfx/walls/woodwall01.png"}
 };
 
 typedef enum sprites_e {
@@ -42,7 +42,7 @@ static struct spritedef_s {
     {TEX_VIEW_KNIFE, SPR_VIEW_KNIFE, 64, 64, 4, 1}
 };
 
-const uint32_t weaponsCount = 1;
+static const uint32_t weaponsCount = 1;
 typedef enum weapons_e {
     WEP_KNIFE = 0
 } WeaponType;
