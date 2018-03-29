@@ -1,7 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 
-void gameInit();
+void gameInit(int argc, char * argv[]);
 void gameLoop();
 void gameDestroy();
 

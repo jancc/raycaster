@@ -60,7 +60,7 @@ void monstersDraw() {
     for(size_t i = 0; i < worldGetMonstersSize(); i++) {
         Monster * monster = monsters[i];
         if(monster != NULL) {
-            gfxRenderSprite(&monster->sprite, monster->x, monster->y, monster->spriteFrameX, monster->spriteFrameY);
+            gfxRenderSprite(monster->sprite, monster->x, monster->y, monster->spriteFrameX, monster->spriteFrameY);
         }
     }
 }
@@ -68,7 +68,6 @@ void monstersDraw() {
 Monster * monsterCreate(MonsterType type) {
     Monster * monster = malloc(sizeof(Monster));
     memset(monster, 0, sizeof(Monster));
-    uint32_t spriteId = 0;
     size_t monsterdefCount = sizeof(monsterdefs) / sizeof(struct monsterdef_s);
     for(size_t i = 0; i < monsterdefCount; i++) {
         struct monsterdef_s monsterdef = monsterdefs[i];
@@ -77,20 +76,13 @@ Monster * monsterCreate(MonsterType type) {
             monster->meleeSqrDistance = monsterdef.meleeAttackDistance * monsterdef.meleeAttackDistance;
             monster->meleeDamage = monsterdef.meleeDamage;
             monster->meleeFrequency = monsterdef.meleeFrequency;
-            spriteId = monsterdef.spriteId;
-        }
-    }
-
-    size_t spritedefsCount = sizeof(spritedefs) / sizeof(struct spritedef_s);
-    for(size_t i = 0; i < spritedefsCount; i++) {
-        struct spritedef_s spritedef = spritedefs[i];
-        if(spritedef.id == spriteId) {
-            monster->sprite.textureId = spritedef.texture;
-            monster->sprite.cellWidth = spritedef.cellWidth;
-            monster->sprite.cellHeight = spritedef.cellHeight;
-            monster->sprite.cellCountX = spritedef.cellCountX;
-            monster->sprite.cellCountY = spritedef.cellCountY;
+            monster->sprite = createSpriteFromId(monsterdef.spriteId);
         }
     }
     return monster;
+}
+
+void monsterFree(Monster * monster) {
+    free(monster->sprite);
+    free(monster);
 }

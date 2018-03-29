@@ -42,6 +42,22 @@ void playerDoShooting(Player * player) {
     }
 }
 
+void playerSelectWeapon(Player * player, WeaponType type) {
+    if(player->weapon.sprite != NULL) {
+        free(player->weapon.sprite);
+    }
+    size_t weapondefsCount = sizeof(weapondefs) / sizeof(struct weapondef_s);
+    for(size_t i = 0; i < weapondefsCount; i++) {
+        struct weapondef_s weapondef = weapondefs[i];
+        if(weapondef.weaponType == type) {
+            player->weapon.damage = weapondef.damage;
+            player->weapon.frequency = weapondef.frequency;
+            player->weapon.maxSqrDistance = weapondef.maxDistance * weapondef.maxDistance;
+            player->weapon.sprite = createSpriteFromId(weapondef.spriteId);
+        }
+    }
+}
+
 void playerUpdate(Player * player) {
     playerDoMovement(player);
     playerDoShooting(player);

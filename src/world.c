@@ -104,7 +104,7 @@ void worldDespawnMonster(Monster * monster, uint8_t autoFree) {
             monsters[i] = NULL;
         }
     }
-    if(autoFree) free(monster);
+    if(autoFree) monsterFree(monster);
 }
 
 Monster ** worldGetMonsters() {

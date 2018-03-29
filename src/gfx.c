@@ -13,10 +13,18 @@ static double cameraX, cameraY, cameraDirX, cameraDirY, cameraBaseplaneX, camera
 static uint32_t windowX, windowY, windowW, windowH;
 static uint32_t fontTextureId, fontCharWidth, fontCharHeight, fontCharCountX;
 
-void gfxInit() {
+void gfxInit(int argc, char * argv[]) {
     IMG_Init(IMG_INIT_PNG);
     window = SDL_CreateWindow("Raycaster", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, GFX_SCREEN_WIDTH, GFX_SCREEN_HEIGHT, 0);
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_TARGETTEXTURE);
+    SDL_RendererFlags rendererFlags = SDL_RENDERER_TARGETTEXTURE;
+    for(int i = 0; i < argc; i++) {
+        if(strcmp(argv[i], "--force-sw") == 0) {
+            rendererFlags |= SDL_RENDERER_SOFTWARE;
+        } else if(strcmp(argv[i], "--force-hw") == 0) {
+            rendererFlags |= SDL_RENDERER_ACCELERATED;
+        }
+    }
+    renderer = SDL_CreateRenderer(window, -1, rendererFlags);
     SDL_SetWindowTitle(window, "This is not the game, it's just a tribute");
     SDL_ShowCursor(SDL_DISABLE);
     screen = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET, GFX_SCREEN_WIDTH, GFX_SCREEN_HEIGHT);
@@ -234,7 +242,10 @@ void gfxRenderSprite(Sprite * sprite, double x, double y, int frameX, int frameY
         dst.h = scale;
         for(int x = 0; x < (int)scale; x++) {
             src.x = x * (64.0/scale) + 64 * frameX;
-            if(zbuffer[dst.x] > fabs(cameraspaceY)) {
+            if(dst.x >= (int32_t)windowW) {
+                break;
+            }
+            if(dst.x >= 0 && zbuffer[dst.x] > fabs(cameraspaceY)) {
                 SDL_RenderCopy(renderer, textures[ sprite->textureId ], &src, &dst);
             }
             dst.x++;
@@ -307,4 +318,21 @@ void gfxRenderHud(Player * player) {
     dst.w = 256;
     dst.h = 256;
     SDL_RenderCopy(renderer, textures[TEX_VIEW_KNIFE], &src, &dst);
+}
+
+Sprite * createSpriteFromId(SpriteId id) {
+    Sprite * sprite = malloc(sizeof(Sprite));
+    memset(sprite, 0, sizeof(Sprite));
+    size_t spritedefsCount = sizeof(spritedefs) / sizeof(struct spritedef_s);
+    for(size_t i = 0; i < spritedefsCount; i++) {
+        struct spritedef_s spritedef = spritedefs[i];
+        if(spritedef.id == id) {
+            sprite->textureId = spritedef.texture;
+            sprite->cellWidth = spritedef.cellWidth;
+            sprite->cellHeight = spritedef.cellHeight;
+            sprite->cellCountX = spritedef.cellCountX;
+            sprite->cellCountY = spritedef.cellCountY;
+        }
+    }
+    return sprite;
 }

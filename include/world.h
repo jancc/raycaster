@@ -3,7 +3,6 @@
 
 #include <stdint.h>
 
-typedef struct sprite_s Sprite;
 typedef struct player_s Player;
 typedef struct monster_s Monster;
 

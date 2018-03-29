@@ -2,6 +2,7 @@
 #define GFX_H
 
 #include <stdint.h>
+#include "config.h"
 
 #define GFX_SCREEN_WIDTH 640
 #define GFX_SCREEN_HEIGHT 360
@@ -23,7 +24,7 @@ typedef struct sprite_s {
     uint32_t cellCountY;
 } Sprite;
 
-void gfxInit();
+void gfxInit(int argc, char * argv[]);
 void gfxBegin();
 void gfxEnd();
 void gfxToggleFullscreen();
@@ -37,5 +38,7 @@ void gfxRenderText(char * text, uint32_t x, uint32_t y);
 void gfxRenderHud(Player * player);
 
 int gfxLoadTexture(const char * filename, uint32_t id);
+
+Sprite * createSpriteFromId(SpriteId id);
 
 #endif

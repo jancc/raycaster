@@ -1,4 +1,4 @@
-CC = clang
+CC = gcc
 INCLUDE = -I../include
 CFLAGS = -std=c11 -Wall -Wextra
 LIBS = `sdl2-config --libs` -lSDL2_mixer -lSDL2_image -lphysfs -lm 
@@ -7,6 +7,9 @@ BIN = ../raycaster
 
 prog: $(OBJ)
 	$(CC) $(CFLAGS) $(INCLUDE) $(OBJ) main.c -o $(BIN) $(LIBS)
+
+debug: CFLAGS += -DDEBUG -g -fsanitize=address -fsanitize=leak
+debug: prog
 
 %.o: %.c
 	$(CC) $(INCLUDE) $(CFLAGS) -c $<

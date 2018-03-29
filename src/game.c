@@ -4,7 +4,7 @@ static Sprite testSprite;
 static uint8_t showMenu;
 static uint8_t forceQuit;
 
-void gameInit() {
+void gameInit(int argc, char * argv[]) {
     timingInit();
     showMenu = 0;
     forceQuit = 0;
@@ -12,7 +12,7 @@ void gameInit() {
     worldCreateTilemap(512, 512);
     srand(56);
     worldRandomize();
-    gfxInit();
+    gfxInit(argc, argv);
     gfxSetRaycastingWindow(0, 0, GFX_SCREEN_WIDTH, GFX_SCREEN_HEIGHT - 64);
     inputInit();
     menuInit();
