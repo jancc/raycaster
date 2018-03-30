@@ -74,6 +74,7 @@ void worldResetPlayer(double x, double y) {
     player->x = x;
     player->y = y;
     player->health = 100;
+    playerSelectWeapon(player, WEP_KNIFE);
 }
 
 Player * worldGetPlayer() {

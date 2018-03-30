@@ -47,7 +47,7 @@ static struct weapondef_s {
     SpriteId spriteId;
     double maxDistance, damage, frequency;
 } const weapondefs[] = {
-    {WEP_KNIFE, SPR_VIEW_KNIFE, 1, 1, 1}
+    {WEP_KNIFE, SPR_VIEW_KNIFE, 1, 1, 0.25}
 };
 
 typedef enum monster_type_e {

@@ -33,6 +33,7 @@ void gfxSetRaycastingWindow(uint32_t x, uint32_t y, uint32_t w, uint32_t h);
 void gfxSetFontTexture(uint32_t id, uint32_t charWidth, uint32_t charHeight, uint32_t charCountX);
 void gfxRenderWorld();
 void gfxRenderSprite(Sprite * sprite, double x, double y, int frameX, int frameY);
+void gfxRenderSprite2D(Sprite * sprite, uint32_t x, uint32_t y, uint32_t scale, int frameX, int frameY);
 void gfxRenderChar(char c, uint32_t x, uint32_t y);
 void gfxRenderText(char * text, uint32_t x, uint32_t y);
 void gfxRenderHud(Player * player);

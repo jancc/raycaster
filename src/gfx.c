@@ -253,6 +253,20 @@ void gfxRenderSprite(Sprite * sprite, double x, double y, int frameX, int frameY
     }
 }
 
+void gfxRenderSprite2D(Sprite * sprite, uint32_t x, uint32_t y, uint32_t scale, int frameX, int frameY) {
+    SDL_Rect src;
+    src.x = sprite->cellWidth * frameX;
+    src.y = sprite->cellHeight * frameY;
+    src.w = sprite->cellWidth;
+    src.h = sprite->cellHeight;
+    SDL_Rect dst;
+    dst.x = x;
+    dst.y = y;
+    dst.w = sprite->cellWidth * scale;
+    dst.h = sprite->cellHeight * scale;
+    SDL_RenderCopy(renderer, textures[ sprite->textureId ], &src, &dst);
+}
+
 void gfxRenderChar(char c, uint32_t x, uint32_t y) {
     SDL_Rect src, dst;
     src.x = (c % fontCharCountX) * fontCharWidth;
@@ -307,17 +321,17 @@ void gfxRenderHud(Player * player) {
     char buf[255];
     snprintf(buf, 255, "Health: %d\nWeapon: %s\nAmmo: %d\nScore: %d", player->health, "AK-47", 10000, 404);
     gfxRenderText(buf, 16, GFX_SCREEN_HEIGHT - 48);
-    SDL_Rect src;
-    src.x = 0;
-    src.y = 0;
-    src.w = 64;
-    src.h = 64;
-    SDL_Rect dst;
-    dst.x = windowX + windowW - 256;
-    dst.y = windowY + windowH - 256;
-    dst.w = 256;
-    dst.h = 256;
-    SDL_RenderCopy(renderer, textures[TEX_VIEW_KNIFE], &src, &dst);
+
+    // Cycle horizontally through all sprite cells
+    // This animation should take exactly as long as the weapon frequency is
+    // However the first cell is skipped, as it implies the weapon is in it's idle state
+    int weaponAnimFrame = 0;
+    double animTime = getTime() - player->weapon.animationStartTime;
+    if(player->weapon.animationStartTime + player->weapon.frequency > getTime()) {
+        int frames = player->weapon.sprite->cellCountX - 1;
+        weaponAnimFrame = (int)((animTime * frames) / player->weapon.frequency) % frames + 1;
+    }
+    gfxRenderSprite2D(player->weapon.sprite, windowX + windowW - 256, windowY + windowH - 256, 4, weaponAnimFrame, 0);
 }
 
 Sprite * createSpriteFromId(SpriteId id) {

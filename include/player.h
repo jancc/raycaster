@@ -11,6 +11,7 @@ typedef struct player_s {
     uint8_t health;
     struct weapon_s {
         Sprite * sprite;
+        double animationStartTime;
         double maxSqrDistance;
         double damage;
         double frequency;
@@ -19,5 +20,6 @@ typedef struct player_s {
 } Player;
 
 void playerUpdate(Player * player);
+void playerSelectWeapon(Player * player, WeaponType type);
 
 #endif

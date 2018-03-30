@@ -31,14 +31,18 @@ void playerDoMovement(Player * player) {
 
 void playerDoShooting(Player * player) {
     if(!inputGetKeyDown(INPUT_FIRE)) return;
+    if(player->weapon.nextShot > getTime()) return;
+    player->weapon.animationStartTime = getTime();
+    player->weapon.nextShot = getTime() + player->weapon.frequency;
     double dx = 1;
     double dy = 0;
     vec2Rotate(&dx, &dy, player->rot);
     Ray ray = {player->x, player->y, dx, dy};
     HitscanOut hit;
     worldHitscan(&ray, &hit, 1, 1);
-    if(hit.hit && hit.monster != NULL && vec2SqrDist(hit.x, hit.y, player->x, player->y) < 1) {
-        worldDespawnMonster(hit.monster, 1);
+    double hitSqrDist = vec2SqrDist(hit.x, hit.y, player->x, player->y);
+    if(hit.hit && hit.monster != NULL && hitSqrDist < player->weapon.maxSqrDistance) {
+        worldDespawnMonster(hit.monster, player->weapon.damage);
     }
 }
 
@@ -54,6 +58,7 @@ void playerSelectWeapon(Player * player, WeaponType type) {
             player->weapon.frequency = weapondef.frequency;
             player->weapon.maxSqrDistance = weapondef.maxDistance * weapondef.maxDistance;
             player->weapon.sprite = createSpriteFromId(weapondef.spriteId);
+            player->weapon.animationStartTime = 0;
         }
     }
 }
