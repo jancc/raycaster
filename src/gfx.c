@@ -140,21 +140,22 @@ void gfxRenderWorld() {
             stepY = 1;
             sideDistY = (mapY + 1.0 - rayY) * deltaDistY;
         }
-        int hit = 0;
+        uint8_t hitdir = 0;
+        uint8_t hitmask = 0;
         int side;
-        while(hit == 0) {
+        while((hitmask & hitdir) == 0) {
             if(sideDistX < sideDistY) {
                 sideDistX += deltaDistX;
                 mapX += stepX;
                 side = 0;
+                hitdir = stepX > 0 ? TILE_COLLIDER_EAST : TILE_COLLIDER_WEST;
             } else {
                 sideDistY += deltaDistY;
                 mapY += stepY;
                 side = 1;
+                hitdir = stepY > 0 ? TILE_COLLIDER_NORTH : TILE_COLLIDER_SOUTH;
             }
-            if(worldGetTile(mapX, mapY) > 0) {
-                hit = 1;
-            }
+            hitmask = worldGetCollision(mapX, mapY);
         }
         if(side == 0) {
             perpWallDist = (mapX - rayX + (1 - stepX) / 2.0) / rayDirX;

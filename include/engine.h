@@ -20,5 +20,6 @@
 //#include "projectile.h"
 #include "timing.h"
 #include "config.h"
+#include "mapgen.h"
 
 #endif

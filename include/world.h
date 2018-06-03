@@ -3,6 +3,11 @@
 
 #include <stdint.h>
 
+#define TILE_COLLIDER_NORTH 1
+#define TILE_COLLIDER_SOUTH 2
+#define TILE_COLLIDER_WEST 4
+#define TILE_COLLIDER_EAST 8
+
 typedef struct player_s Player;
 typedef struct monster_s Monster;
 
@@ -31,6 +36,7 @@ void worldCreateTilemap(uint32_t width, uint32_t height);
 void worldRandomize();
 void worldSetTile(uint32_t x, uint32_t y, uint8_t value);
 uint8_t worldGetTile(uint32_t x, uint32_t y);
+void worldSetCollision(uint32_t x, uint32_t y, uint8_t collisionMask);
 uint8_t worldGetCollision(uint32_t x, uint32_t y);
 uint8_t worldGetCollisionInArea(double x, double y, double w, double h);
 void worldResetPlayer(double x, double y);

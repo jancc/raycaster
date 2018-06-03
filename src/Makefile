@@ -2,7 +2,7 @@ CC = gcc
 INCLUDE = -I../include
 CFLAGS = -std=c11 -Wall -Wextra
 LIBS = `sdl2-config --libs` -lSDL2_mixer -lSDL2_image -lphysfs -lm 
-OBJ = gfx.o world.o game.o input.o bmath.o menu.o player.o monster.o timing.o
+OBJ = gfx.o world.o game.o input.o bmath.o menu.o player.o monster.o timing.o mapgen.o
 BIN = ../raycaster
 
 prog: $(OBJ)

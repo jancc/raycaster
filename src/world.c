@@ -1,6 +1,7 @@
 #include "engine.h"
 
 static uint8_t * tilemap;
+static uint8_t * tilemapCollisions;
 static uint32_t tilemapWidth;
 static uint32_t tilemapHeight;
 static Player * player;
@@ -28,6 +29,7 @@ void worldInit() {
 
 void worldCreateTilemap(uint32_t width, uint32_t height) {
     tilemap = calloc(width * height, sizeof(uint8_t));
+    tilemapCollisions = calloc(width * height, sizeof(uint8_t));
     tilemapWidth = width;
     tilemapHeight = height;
 }
@@ -46,14 +48,26 @@ void worldRandomize() {
 
 void worldSetTile(uint32_t x, uint32_t y, uint8_t value) {
     tilemap[y * tilemapHeight + x] = value;
+    if(value != 0) worldSetCollision(x, y,
+        TILE_COLLIDER_EAST |
+        TILE_COLLIDER_NORTH |
+        TILE_COLLIDER_SOUTH |
+        TILE_COLLIDER_WEST);
+    else worldSetCollision(x, y, 0);
 }
 
 uint8_t worldGetTile(uint32_t x, uint32_t y) {
+    if(x > tilemapWidth || y > tilemapHeight) return 1;
     return tilemap[y * tilemapHeight + x];
 }
 
+void worldSetCollision(uint32_t x, uint32_t y, uint8_t collisionMask) {
+    tilemapCollisions[y * tilemapHeight + x] = collisionMask;
+}
+
 uint8_t worldGetCollision(uint32_t x, uint32_t y) {
-    return worldGetTile(x, y) != 0;
+    if(x > tilemapWidth || y > tilemapHeight) return TILE_COLLIDER_EAST | TILE_COLLIDER_NORTH | TILE_COLLIDER_SOUTH | TILE_COLLIDER_WEST;
+    return tilemapCollisions[y * tilemapHeight + x];
 }
 
 uint8_t worldGetCollisionInArea(double areaX, double areaY, double areaW, double areaH) {
@@ -63,7 +77,7 @@ uint8_t worldGetCollisionInArea(double areaX, double areaY, double areaW, double
     uint32_t yEnd = (uint32_t)(areaY + areaH);
     for(uint32_t y = yStart; y <= yEnd; y++) {
         for(uint32_t x = xStart; x <= xEnd; x++) {
-            if(worldGetCollision(x, y)) return 1;
+            if(worldGetCollision(x, y) > 0) return 1;
         }
     }
     return 0;
@@ -195,7 +209,7 @@ uint8_t worldHitscanTiles(Ray * ray, double * x, double * y) {
             sideDistY += deltaDistY;
             mapY += stepY;
         }
-        if(worldGetTile(mapX, mapY) > 0) {
+        if(worldGetCollision(mapX, mapY) > 0) {
             hit = 1;
         }
     }

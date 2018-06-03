@@ -9,16 +9,15 @@ void gameInit(int argc, char * argv[]) {
     showMenu = 0;
     forceQuit = 0;
     testSprite.textureId = 1;
-    worldCreateTilemap(512, 512);
     srand(56);
-    worldRandomize();
     gfxInit(argc, argv);
     gfxSetRaycastingWindow(0, 0, GFX_SCREEN_WIDTH, GFX_SCREEN_HEIGHT - 64);
     inputInit();
     menuInit();
     worldInit();
     monstersInit();
-    worldResetPlayer(32, 32);
+    mapgenGenerate(512, 512, 1337);
+    worldResetPlayer(mapgenGetPlayerX() + 0.5, mapgenGetPlayerY() + 0.5);
     worldSpawnMonster(monsterCreate(MT_slime), 31.5, 31.5);
     worldSpawnMonster(monsterCreate(MT_slime), 33.5, 32.5);
     worldSpawnMonster(monsterCreate(MT_slime), 31.5, 34.5);
