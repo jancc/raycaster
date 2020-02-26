@@ -15,7 +15,7 @@ typedef struct hitscanOut_s {
     uint8_t hit;
     double x;
     double y;
-    Monster * monster;
+    Monster* monster;
 } HitscanOut;
 
 typedef struct ray_s {
@@ -40,12 +40,13 @@ void worldSetCollision(uint32_t x, uint32_t y, uint8_t collisionMask);
 uint8_t worldGetCollision(uint32_t x, uint32_t y);
 uint8_t worldGetCollisionInArea(double x, double y, double w, double h);
 void worldResetPlayer(double x, double y);
-Player * worldGetPlayer();
-Monster * worldSpawnMonster(Monster * monster, double x, double y);
-void worldDespawnMonster(Monster * monster, uint8_t autoFree);
-Monster ** worldGetMonsters();
+Player* worldGetPlayer();
+Monster* worldSpawnMonster(Monster* monster, double x, double y);
+void worldDespawnMonster(Monster* monster, uint8_t autoFree);
+Monster** worldGetMonsters();
 size_t worldGetMonstersSize();
-uint8_t worldHitscan(Ray * ray, HitscanOut * out, uint8_t tiles, uint8_t monsters);
+uint8_t worldHitscan(Ray* ray, HitscanOut* out, uint8_t tiles,
+                     uint8_t monsters);
 void worldInit();
 void worldUpdate();
 void worldClear();

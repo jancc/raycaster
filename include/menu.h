@@ -14,6 +14,6 @@ void menuBegin();
 void menuEnd();
 void menuResetSelection();
 
-uint8_t menuDoButton(char * text);
+uint8_t menuDoButton(char* text);
 
 #endif

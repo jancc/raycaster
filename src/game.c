@@ -4,7 +4,8 @@ static Sprite testSprite;
 static uint8_t showMenu;
 static uint8_t forceQuit;
 
-void gameInit(int argc, char * argv[]) {
+void gameInit(int argc, char* argv[])
+{
     timingInit();
     showMenu = 0;
     forceQuit = 0;
@@ -24,20 +25,22 @@ void gameInit(int argc, char * argv[]) {
     worldSpawnMonster(monsterCreate(MT_slime), 33.5, 33.5);
 }
 
-void doMenuIngame() {
-    if(menuDoButton("continue")) showMenu = 0;
-    if(menuDoButton("toggle fullscreen")) gfxToggleFullscreen();
-    if(menuDoButton("fill world with bullshit")) worldRandomize();
-    if(menuDoButton("quit")) forceQuit = 1;
+void doMenuIngame()
+{
+    if (menuDoButton("continue")) showMenu = 0;
+    if (menuDoButton("toggle fullscreen")) gfxToggleFullscreen();
+    if (menuDoButton("fill world with bullshit")) worldRandomize();
+    if (menuDoButton("quit")) forceQuit = 1;
 }
 
-void gameStep() {
+void gameStep()
+{
     timingUpdate();
     inputUpdate();
-    if(inputGetFullscreen()) gfxToggleFullscreen();
-    if(inputGetKeyDown(INPUT_TOGGLEMENU)) showMenu = !showMenu;
-    Player * player = worldGetPlayer();
-    if(!showMenu) {
+    if (inputGetFullscreen()) gfxToggleFullscreen();
+    if (inputGetKeyDown(INPUT_TOGGLEMENU)) showMenu = !showMenu;
+    Player* player = worldGetPlayer();
+    if (!showMenu) {
         playerUpdate(player);
         monstersUpdate();
     }
@@ -46,7 +49,7 @@ void gameStep() {
     gfxRenderWorld();
     monstersDraw();
     gfxRenderHud(player);
-    if(showMenu) {
+    if (showMenu) {
         menuBegin();
         doMenuIngame();
         menuEnd();
@@ -54,15 +57,14 @@ void gameStep() {
     gfxEnd();
 }
 
-void gameLoop() {
+void gameLoop()
+{
     uint8_t isRunning = 1;
-    while(isRunning) {
+    while (isRunning) {
         gameStep();
         isRunning = !forceQuit && !inputGetQuit();
         SDL_Delay(10);
     }
 }
 
-void gameDestroy() {
-
-}
+void gameDestroy() {}

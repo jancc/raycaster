@@ -1,8 +1,8 @@
 #ifndef MONSTER_H
 #define MONSTER_H
 
-#include <stdint.h>
 #include "config.h"
+#include <stdint.h>
 
 typedef struct sprite_s Sprite;
 
@@ -18,7 +18,7 @@ typedef enum monster_state_e {
 typedef struct monster_s {
     double x;
     double y;
-    Sprite * sprite;
+    Sprite* sprite;
     int spriteFrameX;
     int spriteFrameY;
     MonsterType type;
@@ -36,7 +36,7 @@ void monstersInit();
 void monstersUpdate();
 void monstersDraw();
 
-Monster * monsterCreate(MonsterType type);
-void monsterFree(Monster * monster);
+Monster* monsterCreate(MonsterType type);
+void monsterFree(Monster* monster);
 
 #endif

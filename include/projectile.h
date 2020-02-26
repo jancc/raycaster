@@ -13,11 +13,12 @@ typedef struct projectile_s {
     double y;
     double vx;
     double vy;
-    Sprite * sprite;
+    Sprite* sprite;
     uint8_t isEvil;
 } Projectile;
 
 void projectilesUpdate();
-uint8_t projectileSpawn(double x, double y, double vx, double vy, Sprite * sprite, uint8_t isEvil);
+uint8_t projectileSpawn(double x, double y, double vx, double vy,
+                        Sprite* sprite, uint8_t isEvil);
 
 #endif

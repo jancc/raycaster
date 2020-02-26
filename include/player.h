@@ -1,8 +1,10 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include <stdint.h>
 #include "config.h"
+#include <stdint.h>
+
+typedef struct sprite_s Sprite;
 
 typedef struct player_s {
     double x;
@@ -10,7 +12,7 @@ typedef struct player_s {
     double rot;
     uint8_t health;
     struct weapon_s {
-        Sprite * sprite;
+        Sprite* sprite;
         double animationStartTime;
         double maxSqrDistance;
         double damage;
@@ -19,7 +21,7 @@ typedef struct player_s {
     } weapon;
 } Player;
 
-void playerUpdate(Player * player);
-void playerSelectWeapon(Player * player, WeaponType type);
+void playerUpdate(Player* player);
+void playerSelectWeapon(Player* player, WeaponType type);
 
 #endif
